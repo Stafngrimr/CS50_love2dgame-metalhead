@@ -14,6 +14,7 @@ function Player:new()
 	self.speed = 200
 	self.runSpeed = 400
 	self.position = "entrance"
+	self.interact = false
 end
 
 function Player:update(dt)
@@ -50,6 +51,14 @@ function Player:update(dt)
 		self.image = love.graphics.newImage("img/player.png")
 	end
 
+	-- Player interaction
+	if love.keyboard.isDown("space") then
+		self.interact = true
+	else
+		self.interact = false
+	end
+		
+
 	if self.y < 100 then
 		self.y = self.y + self.runSpeed * dt
 	elseif self.y > 650 then
@@ -59,9 +68,18 @@ function Player:update(dt)
 	elseif self.x > 650 then
 		self.x = self.x - self.runSpeed * dt
 	end
+
+--	-- Toilet blockers
+--	if self.position == "toilet" then
+--		if self.y > 250 and self.x < 301 then
+--			self.x = 301
+--		elseif self.x < 300 and self.y > 251 then
+--			self.y = 251
+--		end
+--	end
+end
 	
 function Player:draw()
 	love.graphics.draw(self.image, self.x, self.y)
 end
 
-end
