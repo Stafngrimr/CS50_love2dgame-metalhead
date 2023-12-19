@@ -3,8 +3,6 @@ function love.load()
 	Object = require "classic"
 	require "player"
 
-	player = Player()
-
         -- Window settings    
         love.window.setTitle("metalhead")
         love.window.setMode(1450, 800)
@@ -25,11 +23,12 @@ function love.load()
                 height = 600,
                 width = 600
         }
- 
-	--keyObj
+ 	
+	-- PICKUP OBJs
+	-- keyObj
 	key = {
-		x = 150,
-		y = 345,
+		x = map.x + 50,
+		y = map.y + 245,
 		height = 25,
 		width = 25,
 		acquired = false
@@ -37,26 +36,28 @@ function love.load()
 
         -- phoneObj    
         phone = {
-                x = 670,
-                y = 105,
+                x = map.x + 570,
+                y = map.y + 5,
                 height = 25,
 		width = 25,
 		acquired = false
         }
 
+	-- DOOR OBJs
 	-- Toilet door
 	toiletDoor = {
-		x = 690,
-		y = 575,
+		x = map.x + 590,
+		y = map.y + 475,
 		height = 75,
 		width = 10,
 		unlocked = false
 	}
 
+	-- BLOCKED OBJs
 	-- ToiletsObj
 	toilets = {
-		x = 100,
-		y = 300,
+		x = map.x + 200,
+		y = map.y + 100,
 		width = 200,
 		height = 400
 	}
@@ -77,6 +78,8 @@ function love.load()
 	phoneImage = love.graphics.newImage("img/objects/phone.png")
 	door_horizontal = love.graphics.newImage("img/objects/doorHorizontal.png")
 	door_vertical = love.graphics.newImage("img/objects/doorVertical.png")
+
+	player = Player()
 end
 
 function collisionCheck(firstx, firsty, firstw, firsth, secondx, secondy, secondw, secondh)
@@ -96,28 +99,6 @@ function collisionCheck(firstx, firsty, firstw, firsth, secondx, secondy, second
 		and obj1_top < obj2_bottom
 end
 
--- function blockCheck(firstx, firsty, firstw, firsth, objx, objy, objw, objh)
--- 	local player_left = firstx
--- 	local player_right = firstx + firstw
--- 	local player_top = firsty
--- 	local player_bottom = firsty + firsth
--- 
--- 	local obj_left = objx
--- 	local obj_right = objx + objw
--- 	local obj_top = objy
--- 	local obj_bottom = objy + objh
--- 
--- 	if player_left < obj_right then
--- 		player.x = obj_right
--- 	elseif player_right > obj_left then
--- 		player.x = obj_left + player.width
--- 	elseif player_top < obj_bottom then
--- 		player.y = obj_bottom
--- 	elseif player_bottom > obj_top then
--- 		player.y = obj_top + player.height
--- 	end
--- end
-
 function interaction(playx, playy, playw, playh, objx, objy, objw, objh)
 	local player_left = playx
 	local player_right = playx + playw
@@ -130,22 +111,22 @@ function interaction(playx, playy, playw, playh, objx, objy, objw, objh)
 	local obj_bottom = objy + objh
 
 	if player_left >= obj_right
-	and player_left < obj_right + 10
+	and player_left < obj_right + 30
 	and player_top > obj_top
 	and player_top < obj_top + 30 then
 		return true
 	elseif player_right <= obj_left
-	and player_right > obj_left - 10
+	and player_right > obj_left - 30
 	and player_top > obj_top
 	and player_top < obj_top + 30 then
 		return true
 	elseif player_top >= obj_bottom
-	and player_top < obj_bottom + 10
+	and player_top < obj_bottom + 30
 	and player_left > obj_top
 	and player_left < obj_left + 30 then
 		return true
 	elseif player_bottom <= obj_top
-	and player_top > obj_bottom - 10
+	and player_top > obj_bottom - 30
 	and player_left > obj_top
 	and player_left < obj_left + 30 then
 		return true
@@ -156,7 +137,8 @@ end
 
 function love.update(dt)
 	player:update(dt)
-	-- Interaction with objects
+
+	-- Picking up of Obj(s)
 	if collisionCheck(player.x, player.y, player.width, player.height, key.x, key.y, key.width, key.height)
 	and player.position == "toilet"
 	and key.acquired == false then
@@ -169,12 +151,6 @@ function love.update(dt)
 		phone.acquired = true
 	end
 
-	
-	--Toilets check
-	if player.positon == "toilet" then
-		blockCheck(player.x, player.y, player.width, player.height, toilets.x, toilets.y, toilets.width, toilets.height)
-	end
-
 	--Toilet door unlock
 	if player.position == "toilet" and key.acquired == true and player.interact == true then
 		if interaction(player.x, player.y, player.width, player.height, toiletDoor.x, toiletDoor.y, toiletDoor.width, toiletDoor.height) == true then
@@ -184,46 +160,46 @@ function love.update(dt)
 
 	-- Move from one room to another
 	if player.position == "entrance" then
-		if collisionCheck(player.x, player.y, player.width, player.height, 100, 575, 1, 75) then
+		if collisionCheck(player.x, player.y, player.width, player.height, map.x, map.y + 475, 1, 75) then
 			player.position = "toilet"
-			player.x = 640
-			player.y = 587
-		elseif collisionCheck(player.x, player.y, player.width, player.height, 699, 575, 1, 75) then
+			player.x = map.x + 540
+			player.y = map.y + 487
+		elseif collisionCheck(player.x, player.y, player.width, player.height, map.x + 599, map.y + 475, 1, 75) then
 			player.position = "cloakroom"
-			player.x = 110
-			player.y = 587
-		elseif collisionCheck(player.x, player.y, player.width, player.height, 361, 100, 75, 1) then
+			player.x = map.x + 10
+			player.y = map.y + 487
+		elseif collisionCheck(player.x, player.y, player.width, player.height, map.x + 261, map.y, 75, 1) then
 			player.position = "bar"
-			player.x = 373
-			player.y = 640
+			player.x = map.x + 273
+			player.y = map.y + 540
 		end
 	elseif player.position == "toilet" then
-		if collisionCheck(player.x, player.y, player.width, player.height, 699, 575, 1, 75) then
+		if collisionCheck(player.x, player.y, player.width, player.height, map.x + 599, map.y + 475, 1, 75) then
 			player.position = "entrance"
-			player.x = 110
-			player.y = 587
+			player.x = map.x + 10
+			player.y = map.y + 487
 		end
 	elseif player.position == "cloakroom" then
-		if collisionCheck(player.x, player.y, player.width, player.height, 100, 575, 1, 75) then
+		if collisionCheck(player.x, player.y, player.width, player.height, map.x, map.y + 475, 1, 75) then
 			player.position = "entrance"
-			player.x = 640
-			player.y = 587
+			player.x = map.x + 540
+			player.y = map.y + 487
 		end
 	elseif player.position == "bar" then
-		if collisionCheck(player.x, player.y, player.width, player.height, 100, 361, 1, 75) then
+		if collisionCheck(player.x, player.y, player.width, player.height, map.x, map.y + 261, 1, 75) then
 			player.position = "venue"
-			player.x = 640
-			player.y = 373
-		elseif collisionCheck(player.x, player.y, player.width, player.height, 361, 699, 75, 1) then
+			player.x = map.x + 540
+			player.y = map.y + 273
+		elseif collisionCheck(player.x, player.y, player.width, player.height, map.x + 261, map.y + 599, 75, 1) then
 			player.position = "entrance"
-			player.x = 373
-			player.y = 110
+			player.x = map.x + 273
+			player.y = map.y + 10
 		end
 	elseif player.position == "venue" then
-		if collisionCheck(player.x, player.y, player.width, player.height, 699, 361, 1, 75) then
+		if collisionCheck(player.x, player.y, player.width, player.height, map.x + 599, map.y + 261, 1, 75) then
 			player.position = "bar"
-			player.x = 110
-			player.y = 373
+			player.x = map.x + 10
+			player.y = map.y + 273
 		end
 	end
 end
@@ -235,7 +211,7 @@ function love.draw()
 	function menuText()
 		love.graphics.setFont(font)
 		love.graphics.setColor(1, 1, 0, 0.5)
-		love.graphics.printf(text, 800, 150, 500)
+		love.graphics.printf(text, square.x + 50, square.y + 50, 500)
 	end
 
 	-- Map
@@ -243,7 +219,7 @@ function love.draw()
 		love.graphics.draw(entranceMap, map.x, map.y)
 	elseif player.position == "toilet" then
 		love.graphics.draw(toiletMap, map.x, map.y)
-		love.graphics.draw(objToilets, 100, 300)
+		love.graphics.draw(objToilets, toilets.x, toilets.y)
 	elseif player.position == "cloakroom" then
 		love.graphics.draw(cloakroomMap, map.x, map.y)
 	elseif player.position == "bar" then
