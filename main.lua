@@ -54,13 +54,14 @@ function love.load()
 	}
 
 	-- BLOCKED OBJs
-	-- ToiletsObj
+	-- location: toilets
 	toilets = {
 		x = map.x + 200,
 		y = map.y + 100,
 		width = 200,
 		height = 400
 	}
+
 
        text = "Metalhead by Stafngrimr\n\nYou wake up in a bathroom, and can't remember how you got here. There's no one else around, and this place stinks. Your head hurts, you feel dazed and is that piss you can feel on your jeans?\nYou get up off the floor slowly and take a moment to gather yourself. Memories are slowly coming back. You're were at a metal gig with your mates. Someone bought a round of drinks and then... nothing.\n\nYou better get yourself out of here. Find your friends and find out what happened to you.\n\n"
 
@@ -219,7 +220,6 @@ function love.draw()
 		love.graphics.draw(entranceMap, map.x, map.y)
 	elseif player.position == "toilet" then
 		love.graphics.draw(toiletMap, map.x, map.y)
-		love.graphics.draw(objToilets, toilets.x, toilets.y)
 	elseif player.position == "cloakroom" then
 		love.graphics.draw(cloakroomMap, map.x, map.y)
 	elseif player.position == "bar" then
@@ -262,6 +262,7 @@ function love.focus(f)
 end
 
 function love.mousepressed(x, y, button)
+	-- Not going to use this anymore but keeping on here as it's useful.
 --	if button == 1 and x > 1400 and x < 1425 and y > 25 and y < 50 then
 --		print("Quit by CROSS")
 --		love.event.quit()
