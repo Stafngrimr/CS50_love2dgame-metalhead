@@ -68,6 +68,7 @@ function Player:update(dt)
 	elseif self.x > (map.x + map.width) - self.width then
 		self.x = self.x - self.runSpeed * dt
 	end
+end
 
 function Player:draw()
 	love.graphics.draw(self.image, self.x, self.y)
