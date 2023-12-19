@@ -1,20 +1,26 @@
 # The LOVE Game
 
+We're making a 2d story driven game about a metalhead who wakes up at a gig venue. All he can remember is that he came to a gig with some friends and they'd started having some drinks before the show.
+Did he get drugged? Why is he in the bathroom? Where are his friends? What's going on?
+Idunno, play it and find out.
+
+This is my first time using LOVE/Lua, so it's a tester game and also my CS50 final project.
+
 ## Resources
 https://sheepolution.com/learn/book/contents
 https://simplegametutorials.github.io/love/
 "Challenges for Game Designers." by Romero and Schreiber
 https://extracredits.site
 
-## What kind of game are we going to make?
+## Things to learn
 
-There are going to be 6 rooms.
+- Create objects (bars, toilet stalls) that the player collides with, and stops them. Each room will be a different shape this way. SORT OF.
+- Creation of other NPCs that move a bit around.. 
 
-You wake up disoriented in the first room. You're not sure how you arrived and you think you passed out from being drunk or maybe someone spiked your drink??
-
-You remember getting to the venue and not much else past that.. You look around and you're in the toilet actually. How on earth did I get in here. I think I locked myself in.. 
-
-Better find the key..
-
-(pickup the key)
-Ah, there's the key. I can get out of here finally.
+## Features to add
+- Pause the game when focus has been lost.
+- Beautifully painted backgrounds.
+- An Intro/Title page, with start menu and etc.
+- Music/Audio.
+- The ability to save progress.
+- Scrolling text as the story progresses.
