@@ -43,8 +43,7 @@ function love.load()
 		acquired = false
         }
 
-	-- DOOR OBJs
-	-- Toilet door
+	--location:toilet
 	toiletDoor = {
 		x = map.x + 590,
 		y = map.y + 475,
@@ -53,13 +52,18 @@ function love.load()
 		unlocked = false
 	}
 
-	-- BLOCKED OBJs
-	-- location: toilets
 	toilets = {
-		x = map.x + 200,
-		y = map.y + 100,
+		x = map.x,
+		y = map.y + 293,
 		width = 200,
-		height = 400
+		height = 307,
+	}
+
+	stallwall = {
+		x = map.x,
+		y = map.y + 200,
+		width = 200,
+		height = 5
 	}
 
 
@@ -83,69 +87,24 @@ function love.load()
 	player = Player()
 end
 
-function collisionCheck(firstx, firsty, firstw, firsth, secondx, secondy, secondw, secondh)
-	local obj1_left = firstx
-	local obj1_right = firstx + firstw
-	local obj1_top = firsty 
-	local obj1_bottom = firsty + firsth
-
-	local obj2_left = secondx
-	local obj2_right = secondx + secondw
-	local obj2_top = secondy
-	local obj2_bottom = secondy + secondh
-
-	return obj1_right > obj2_left
-		and obj1_left < obj2_right
-		and obj1_bottom > obj2_top
-		and obj1_top < obj2_bottom
-end
-
-function interaction(playx, playy, playw, playh, objx, objy, objw, objh)
-	local player_left = playx
-	local player_right = playx + playw
-	local player_top = playy
-	local player_bottom = playy + playh
-
-	local obj_left = objx
-	local obj_right = objx + objw
-	local obj_top = objy
-	local obj_bottom = objy + objh
-
-	if player_left >= obj_right
-	and player_left < obj_right + 30
-	and player_top > obj_top
-	and player_top < obj_top + 30 then
-		return true
-	elseif player_right <= obj_left
-	and player_right > obj_left - 30
-	and player_top > obj_top
-	and player_top < obj_top + 30 then
-		return true
-	elseif player_top >= obj_bottom
-	and player_top < obj_bottom + 30
-	and player_left > obj_top
-	and player_left < obj_left + 30 then
-		return true
-	elseif player_bottom <= obj_top
-	and player_top > obj_bottom - 30
-	and player_left > obj_top
-	and player_left < obj_left + 30 then
-		return true
-	else
-		return false
-	end
-end
-
 function love.update(dt)
 	player:update(dt)
+	
+	if player.position == "toilet" then
+		player:resolveCollision(toilets.x, toilets.y, toilets.width, toilets.height)
+		player:resolveCollision(stallwall.x, stallwall.y, stallwall.width, stallwall.height)
+		if toiletDoor.unlocked == false then
+			player:resolveCollision(toiletDoor.x, toiletDoor.y, toiletDoor.width, toiletDoor.height)
+		end
+	end
 
 	-- Picking up of Obj(s)
-	if collisionCheck(player.x, player.y, player.width, player.height, key.x, key.y, key.width, key.height)
+	if player:collisionCheck(key.x, key.y, key.width, key.height)
 	and player.position == "toilet"
 	and key.acquired == false then
 		text = text .."Aha, you've found the toilet door key! You can get out now\n\n"
 		key.acquired = true
-	elseif collisionCheck(player.x, player.y, player.width, player.height, phone.x, phone.y, phone.width, phone.height)
+	elseif player:collisionCheck(phone.x, phone.y, phone.width, phone.height)
 	and player.position == "venue"
 	and phone.acquired == false then
 		text = text .."Oh shit, it's my phone! Can't believe it hasn't been nicked. No signal though. I guess I'll try it back outside and see if I can reach anyone.\n\n"
@@ -154,50 +113,50 @@ function love.update(dt)
 
 	--Toilet door unlock
 	if player.position == "toilet" and key.acquired == true and player.interact == true then
-		if interaction(player.x, player.y, player.width, player.height, toiletDoor.x, toiletDoor.y, toiletDoor.width, toiletDoor.height) == true then
+		if player:interactionCheck(toiletDoor) == true then
 			toiletDoor.unlocked = true
 		end
 	end
 
 	-- Move from one room to another
 	if player.position == "entrance" then
-		if collisionCheck(player.x, player.y, player.width, player.height, map.x, map.y + 475, 1, 75) then
+		if player:collisionCheck(map.x, map.y + 475, 1, 75) then
 			player.position = "toilet"
 			player.x = map.x + 540
 			player.y = map.y + 487
-		elseif collisionCheck(player.x, player.y, player.width, player.height, map.x + 599, map.y + 475, 1, 75) then
+		elseif player:collisionCheck(map.x + 599, map.y + 475, 1, 75) then
 			player.position = "cloakroom"
 			player.x = map.x + 10
 			player.y = map.y + 487
-		elseif collisionCheck(player.x, player.y, player.width, player.height, map.x + 261, map.y, 75, 1) then
+		elseif player:collisionCheck(map.x + 261, map.y, 75, 1) then
 			player.position = "bar"
 			player.x = map.x + 273
 			player.y = map.y + 540
 		end
 	elseif player.position == "toilet" then
-		if collisionCheck(player.x, player.y, player.width, player.height, map.x + 599, map.y + 475, 1, 75) then
+		if player:collisionCheck(map.x + 599, map.y + 475, 1, 75) then
 			player.position = "entrance"
 			player.x = map.x + 10
 			player.y = map.y + 487
 		end
 	elseif player.position == "cloakroom" then
-		if collisionCheck(player.x, player.y, player.width, player.height, map.x, map.y + 475, 1, 75) then
+		if player:collisionCheck(map.x, map.y + 475, 1, 75) then
 			player.position = "entrance"
 			player.x = map.x + 540
 			player.y = map.y + 487
 		end
 	elseif player.position == "bar" then
-		if collisionCheck(player.x, player.y, player.width, player.height, map.x, map.y + 261, 1, 75) then
+		if player:collisionCheck(map.x, map.y + 261, 1, 75) then
 			player.position = "venue"
 			player.x = map.x + 540
 			player.y = map.y + 273
-		elseif collisionCheck(player.x, player.y, player.width, player.height, map.x + 261, map.y + 599, 75, 1) then
+		elseif player:collisionCheck(map.x + 261, map.y + 599, 75, 1) then
 			player.position = "entrance"
 			player.x = map.x + 273
 			player.y = map.y + 10
 		end
 	elseif player.position == "venue" then
-		if collisionCheck(player.x, player.y, player.width, player.height, map.x + 599, map.y + 261, 1, 75) then
+		if player:collisionCheck(map.x + 599, map.y + 261, 1, 75) then
 			player.position = "bar"
 			player.x = map.x + 10
 			player.y = map.y + 273

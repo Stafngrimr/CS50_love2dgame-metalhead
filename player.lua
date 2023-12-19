@@ -15,9 +15,18 @@ function Player:new()
 	self.runSpeed = 400
 	self.position = "toilet"
 	self.interact = false
+
+	self.last = {
+		x = self.x,
+		y = self.y
+	}
 end
 
 function Player:update(dt)
+	-- collision updates
+	self.last.x = self.x
+	self.last.y = self.y
+
 	-- Player movement
 	if love.keyboard.isDown("w") then
 		if love.keyboard.isDown("lshift") then
@@ -70,7 +79,67 @@ function Player:update(dt)
 	end
 end
 
+-- Player collision checking
+function Player:collisionCheck(objx, objy, objw, objh)
+	local player_left = self.x
+	local player_right = self.x + self.width
+	local player_top = self.y
+	local player_bottom = self.y + self.height
+	local obj_left = objx
+	local obj_right = objx + objw
+	local obj_top = objy
+	local obj_bottom = objy + objh
+
+	return player_left < obj_right
+	and player_right > obj_left
+	and player_top < obj_bottom
+	and player_bottom > obj_top
+end
+
+--collisionResolution
+function Player:resolveCollision(objx, objy, objw, objh)
+	if self:collisionCheck(objx, objy, objw, objh) then
+		self.x = self.last.x
+		self.y = self.last.y
+	end
+end
+
+--Player interaction
+function Player:interactionCheck(obj)
+	local player_left = self.x
+	local player_right = self.x + self.width
+	local player_top = self.y
+	local player_bottom = self.y + self.height
+	local obj_left = obj.x
+	local obj_right = obj.x + obj.width
+	local obj_top = obj.y
+	local obj_bottom = obj.y + obj.height
+
+	if player_left >= obj_right
+	and player_left < obj_right + 30
+	and player_top > obj_top
+	and player_top < obj_top + 30 then
+		return true
+	elseif player_right <= obj_left
+	and player_right > obj_left - 30
+	and player_top > obj_top
+	and player_top < obj_top + 30 then
+		return true
+	elseif player_top >= obj_bottom
+	and player_top < obj_bottom + 30
+	and player_left > obj_left
+	and player_left < obj_left + 30 then
+		return true
+	elseif player_bottom <= obj_top
+	and player_bottom > obj_top - 30
+	and player_left > obj_left
+	and player_left < obj_left + 30 then
+		return true
+	else
+		return false
+	end
+end
+
 function Player:draw()
 	love.graphics.draw(self.image, self.x, self.y)
 end
-
