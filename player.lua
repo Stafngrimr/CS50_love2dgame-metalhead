@@ -7,14 +7,18 @@ west = love.graphics.newImage("img/west.png")
 
 function Player:new()
 	self.image = love.graphics.newImage("img/player.png")
-	self.x = map.x + 500
-	self.y = map.y + 500
+	self.x = map.x + 400
+	self.y = map.y + 400
 	self.height = 50
 	self.width = 50
 	self.speed = 200
 	self.runSpeed = 400
 	self.position = "toilet"
 	self.interact = false
+	self.firstEntrance = true
+	self.firstCloakroom = true
+	self.firstBar = true
+	self.firstVenue = true
 
 	self.last = {
 		x = self.x,
@@ -58,6 +62,11 @@ function Player:update(dt)
 		self.image = west
 	else
 		self.image = love.graphics.newImage("img/player.png")
+	end
+
+	--Game ender
+	if love.keyboard.isDown("return") and mates.interact == true then
+		gameOver = true
 	end
 
 	-- Player interaction
@@ -106,34 +115,15 @@ end
 
 --Player interaction
 function Player:interactionCheck(obj)
-	local player_left = self.x
-	local player_right = self.x + self.width
-	local player_top = self.y
-	local player_bottom = self.y + self.height
-	local obj_left = obj.x
-	local obj_right = obj.x + obj.width
-	local obj_top = obj.y
-	local obj_bottom = obj.y + obj.height
+	local px = self.x + (self.width / 2)
+	local py = self.y + (self.height / 2)
 
-	if player_left >= obj_right
-	and player_left < obj_right + 30
-	and player_top > obj_top
-	and player_top < obj_top + 30 then
-		return true
-	elseif player_right <= obj_left
-	and player_right > obj_left - 30
-	and player_top > obj_top
-	and player_top < obj_top + 30 then
-		return true
-	elseif player_top >= obj_bottom
-	and player_top < obj_bottom + 30
-	and player_left > obj_left
-	and player_left < obj_left + 30 then
-		return true
-	elseif player_bottom <= obj_top
-	and player_bottom > obj_top - 30
-	and player_left > obj_left
-	and player_left < obj_left + 30 then
+	local objleft = obj.intx
+	local objright = obj.intx + obj.intw
+	local objtop = obj.inty
+	local objbottom = obj.inty + obj.inth
+
+	if px >= objleft and px <= objright and py >= objtop and py <= objbottom then
 		return true
 	else
 		return false
