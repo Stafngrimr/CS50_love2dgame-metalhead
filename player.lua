@@ -64,9 +64,15 @@ function Player:update(dt)
 		self.image = love.graphics.newImage("img/player.png")
 	end
 
-	--Game ender
-	if love.keyboard.isDown("return") and mates.interact == true then
-		gameOver = true
+	-- game statuses
+	if gameIntro == true then
+		if love.keyboard.isDown("return") then
+			gameIntro = false
+		end
+	elseif gameOver == false and mates.interact == true then
+		if love.keyboard.isDown("return") then
+			gameOver = true
+		end
 	end
 
 	-- Player interaction

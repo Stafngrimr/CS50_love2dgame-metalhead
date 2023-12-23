@@ -8,6 +8,7 @@ function love.load()
         love.window.setMode(1450, 800)
         font = love.graphics.newFont("img/Courier New.ttf", 20)
 	gameOver = false
+	gameIntro = true
 
         -- Map Area     
         map = {
@@ -140,8 +141,34 @@ function love.load()
 		inth = 200
 	}
 
-	--TODO: Add some bar tables around perhaps!
-	
+	tableTopLeft = {
+		x = map.x + 100,
+		y = map.y + 150,
+		width = 75,
+		height = 75
+	}
+
+	tableTopRight = {
+		x = map.x + 300,
+		y = map.y + 150,
+		width = 75,
+		height = 75
+	}
+
+	tableBottomLeft = {
+		x = map.x + 100,
+		y = map.y + 350,
+		width = 75,
+		height = 75
+	}
+
+	tableBottomRight = {
+		x = map.x + 300,
+		y = map.y + 350,
+		width = 75,
+		height = 75
+	}
+
 	--location:venue
 	secretDoor = {
 		x = map.x + 200,
@@ -161,6 +188,7 @@ function love.load()
 		y = map.y + 550,
 		width = 50,
 		height = 50,
+		image = love.graphics.newImage("img/peeps/bouncer.png"),
 		interact = false,
 		intx = map.x + 193,
 		inty = map.y + 520,
@@ -173,6 +201,7 @@ function love.load()
 		y = map.y + 300,
 		width = 50,
 		height = 50,
+		image = love.graphics.newImage("img/peeps/merchguy.png"),
 		interact = false,
 		intx = map.x + 70,
 		inty = map.y + 280,
@@ -184,21 +213,24 @@ function love.load()
 		x = map.x + 530,
 		y = map.y + 475,
 		width = 50,
-		height = 50
+		height = 50,
+		image = love.graphics.newImage("img/peeps/cloakroomlady.png")
 	}
 
 	barkeeptop = {
 		x = map.x + 530,
 		y = map.y + 125,
 		width = 50,
-		height = 50
+		height = 50,
+		image = love.graphics.newImage("img/peeps/bartop.png")
 	}
 
 	barkeepbottom = {
 		x = map.x + 530,
 		y = map.y + 425,
 		width = 50,
-		height = 50
+		height = 50,
+		image = love.graphics.newImage("img/peeps/barbottom.png")
 	}
 
 	robed_bar = {
@@ -220,21 +252,24 @@ function love.load()
 		x = map.x + 250,
 		y = map.y + 400,
 		width = 50,
-		height = 50
+		height = 50,
+		image = love.graphics.newImage("img/peeps/mate1.png")
 	}
 
 	mate2 = {
 		x = map.x + 310,
 		y = map.y + 410,
 		width = 50,
-		height = 50
+		height = 50,
+		image = love.graphics.newImage("img/peeps/mate2.png")
 	}
 
 	mate3 = {
 		x = map.x + 370,
 		y = map.y + 400,
 		width = 50,
-		height = 50
+		height = 50,
+		image = love.graphics.newImage("img/peeps/mate3.png")
 	}
 
 	mates = {
@@ -254,11 +289,21 @@ function love.load()
 	toiletMap = love.graphics.newImage("img/rooms/toilet.png")
 	cloakroomMap = love.graphics.newImage("img/rooms/cloakroom.png")
 	barMap = love.graphics.newImage("img/rooms/bar.png")
+	bar2Map = love.graphics.newImage("img/rooms/bar2.png")
 	venueMap = love.graphics.newImage("img/rooms/venue.png")
+
+	introScreen = love.graphics.newImage("img/introleft.png")
+	enterScreen = love.graphics.newImage("img/introright.png")
 
 	-- common objects
 	door_horizontal = love.graphics.newImage("img/objects/doorHorizontal.png")
 	door_vertical = love.graphics.newImage("img/objects/doorVertical.png")
+
+	-- characters
+	robedNorth = love.graphics.newImage("img/peeps/robednorth.png")
+	robedEast = love.graphics.newImage("img/peeps/robedeast.png")
+	robedSouth = love.graphics.newImage("img/peeps/robedsouth.png")
+	robedWest = love.graphics.newImage("img/peeps/robedwest.png")
 
 	player = Player()
 end
@@ -295,9 +340,23 @@ function love.update(dt)
 	end
 
 	if player.position == "bar" then
-		player:resolveCollision(bartop.x, bartop.y, bartop.width, bartop.height)
-		player:resolveCollision(barbottom.x, barbottom.y, barbottom.width, barbottom.height)
-		player:resolveCollision(robed_bar.x, robed_bar.y, robed_bar.width, robed_bar.height)
+		if phone.acquired == true then
+			player:resolveCollision(map.x, map.y, 600, 225)
+			player:resolveCollision(map.x, map.y + 350, 175, 250)
+			player:resolveCollision(map.x, map.y + 470, 225, 130)
+			player:resolveCollision(map.x, map.y + 543, 250, 57)
+			player:resolveCollision(map.x + 300, map.y, 300, 425)
+			player:resolveCollision(map.x + 319, map.y, 281, 489)
+			player:resolveCollision(map.x + 344, map.y, 256, 600)
+		else
+			player:resolveCollision(bartop.x, bartop.y, bartop.width, bartop.height)
+			player:resolveCollision(barbottom.x, barbottom.y, barbottom.width, barbottom.height)
+			player:resolveCollision(robed_bar.x, robed_bar.y, robed_bar.width, robed_bar.height)
+			player:resolveCollision(tableTopLeft.x, tableTopLeft.y, tableTopLeft.width, tableTopLeft.height)
+			player:resolveCollision(tableTopRight.x, tableTopRight.y, tableTopRight.width, tableTopRight.height)
+			player:resolveCollision(tableBottomLeft.x, tableBottomLeft.y, tableBottomLeft.width, tableBottomLeft.height)
+			player:resolveCollision(tableBottomRight.x, tableBottomRight.y, tableBottomRight.width, tableBottomRight.height)
+		end
 	end
 
 	if player.position == "venue" then
@@ -364,7 +423,7 @@ function love.update(dt)
 	if player.position == "cloakroom" and player.interact == true then
 		if player:interactionCheck(cloakTable) == true then
 			if cloakTable.interact == false then
-				text = "Attendant: Hello. You back again? Last band's on in a minute, didn't you say they're your favourite? They closed the door to the venue because someone was kicking off. Should be open now though if you wanted to go in.\n\nShe hands you some items in exchange for the ticket stub you found.\n\nIt's your wallet! Cards are all still there thank fuck.. there's also a weird bright red ticket stub, but with no number on it. It's been ripped, so I guess it's been used?\n\nBet my friends are in the venue.\n\n"
+				text = "Attendant: Hello. You back again? Last band's on in a minute, didn't you say they're your favourite?They closed the door to the venue because someone was kicking off. Should be open now though if you wanted to go in.\n\nShe hands you some items in exchange for the ticket stub you found.\n\nIt's your wallet! Cards are all still there thank fuck.. there's also a weird bright red ticket stub, but with no number on it. It's been ripped, so I guess it's been used?\n\nBet my friends are in the venue.\n\n"
 				cloakTable.interact = true
 			end
 		end
@@ -461,6 +520,9 @@ function love.update(dt)
 			player.position = "bar"
 			player.x = map.x + 10
 			player.y = map.y + 273
+			if phone.acquired == true then
+				text = text .."Okay.. that's creepy.. I gotta get out of here quickly."
+			end
 		end
 	end
 end
@@ -483,7 +545,11 @@ function love.draw()
 	elseif player.position == "cloakroom" then
 		love.graphics.draw(cloakroomMap, map.x, map.y)
 	elseif player.position == "bar" then
-		love.graphics.draw(barMap, map.x, map.y)
+		if phone.acquired == true then
+			love.graphics.draw(bar2Map, map.x, map.y)
+		else
+			love.graphics.draw(barMap, map.x, map.y)
+		end
 	elseif player.position == "venue" then
 		love.graphics.draw(venueMap, map.x, map.y)
 	end
@@ -503,43 +569,30 @@ function love.draw()
 
 	--entrance objects
 	if player.position == "entrance" then
-		love.graphics.setColor(1, 0, 0, 1)
-		love.graphics.rectangle("fill", bouncer.x, bouncer.y, bouncer.width, bouncer.height)
-		love.graphics.rectangle("fill", merchguy.x, merchguy.y, merchguy.width, merchguy.height)
-		love.graphics.setColor(1, 0, 1, 1)
-		love.graphics.rectangle("fill", merchTable.x, merchTable.y, merchTable.width, merchTable.height)
+		love.graphics.setColor(1, 1, 1, 1)
+		love.graphics.draw(bouncer.image, bouncer.x, bouncer.y)
+		love.graphics.draw(merchguy.image, merchguy.x, merchguy.y)
 		if player.firstCloakroom == true then
-			love.graphics.setColor(1, 1, 1, 1)
 			love.graphics.draw(door_horizontal, venueDoor.x, venueDoor.y)
 		end
 		if phone.acquired == true then
-			love.graphics.setColor(0, 0, 0, 1)
-			love.graphics.rectangle("fill", mate1.x, mate1.y, mate1.width, mate1.height)
-			love.graphics.rectangle("fill", mate2.x, mate2.y, mate2.width, mate2.height)
-			love.graphics.rectangle("fill", mate3.x, mate3.y, mate3.width, mate3.height)
+			love.graphics.draw(mate1.image, mate1.x, mate1.y)
+			love.graphics.draw(mate2.image, mate2.x, mate2.y)
+			love.graphics.draw(mate3.image, mate3.x, mate3.y)
 		end
 	end
 
 	--cloakroom objects
 	if player.position == "cloakroom" then
-		love.graphics.setColor(1, 0, 1, 1)
-		love.graphics.rectangle("fill", cloakTable.x, cloakTable.y, cloakTable.width, cloakTable.height)
-		love.graphics.rectangle("fill", cloakTable2.x, cloakTable2.y, cloakTable2.width, cloakTable2.height)
-		love.graphics.setColor(1, 0, 0, 1)
-		love.graphics.rectangle("fill", cloakroomlady.x, cloakroomlady.y, cloakroomlady.width, cloakroomlady.height)
+		love.graphics.draw(cloakroomlady.image, cloakroomlady.x, cloakroomlady.y)
 	end
 	
 	--bar objects
 	if player.position == "bar" then
-		love.graphics.setColor(1, 0, 1, 1)
-		love.graphics.rectangle("fill", bartop.x, bartop.y, bartop.width, bartop.height)
-		love.graphics.rectangle("fill", barbottom.x, barbottom.y, barbottom.width, barbottom.height)
-		love.graphics.setColor(1, 0, 0, 1)
-		love.graphics.rectangle("fill", barkeeptop.x, barkeeptop.y, barkeeptop.width, barkeeptop.height)
-		love.graphics.rectangle("fill", barkeepbottom.x, barkeepbottom.y, barkeepbottom.width, barkeepbottom.height)
+		love.graphics.draw(barkeeptop.image, barkeeptop.x, barkeeptop.y)
+		love.graphics.draw(barkeepbottom.image, barkeepbottom.x, barkeepbottom.y)
 		if player.firstBar == true then
-			love.graphics.setColor(0, 0, 0, 1)
-			love.graphics.rectangle("fill", robed_bar.x, robed_bar.y, robed_bar.width, robed_bar.height)
+			love.graphics.draw(robedNorth, robed_bar.x, robed_bar.y)
 		end
 	end
 
@@ -557,8 +610,11 @@ function love.draw()
 	-- Player
 	player:draw()
 
-	if gameOver == true then
-		text = "GAME OVER. FUCK. OFF."
+	if gameIntro == true then
+		love.graphics.draw(introScreen, map.x, map.y)
+		love.graphics.draw(enterScreen, square.x, square.y)
+	elseif gameOver == true then
+		text = "GAME OVER.\n\nHope you enjoyed the game!\n\nPlease press ESC to exit."
 	end
 end
 
