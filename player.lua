@@ -68,9 +68,11 @@ function Player:update(dt)
 	if gameIntro == true then
 		if love.keyboard.isDown("return") then
 			gameIntro = false
+			startNoise:play()
 		end
 	elseif gameOver == false and mates.interact == true then
 		if love.keyboard.isDown("return") then
+			endNoise:play()
 			gameOver = true
 		end
 	end

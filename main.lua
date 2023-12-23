@@ -7,6 +7,14 @@ function love.load()
         love.window.setTitle("metalhead")
         love.window.setMode(1450, 800)
         font = love.graphics.newFont("img/Courier New.ttf", 20)
+	song = love.audio.newSource("Gigakoops - What the Flux .mp3", "stream")
+	keyNoise = love.audio.newSource("coin_c_02-102844.mp3", "static")
+	doorNoise = love.audio.newSource("dorm-door-opening-6038.mp3", "static")
+	bouncerNoise = love.audio.newSource("male-angry-growl-6932.mp3", "static")
+	startNoise = love.audio.newSource("interface-124464.mp3", "static")
+	endNoise = love.audio.newSource("short-crowd-cheer-6713.mp3", "static")
+	barNormalNoise = love.audio.newSource("cafe-ambience-9263.mp3", "static")
+	barRobedNoise = love.audio.newSource("strange-creature-talks-96872.mp3", "static")
 	gameOver = false
 	gameIntro = true
 
@@ -94,6 +102,11 @@ function love.load()
 		y = map.y + 50,
 		width = 100,
 		height = 200,
+		interact = false,
+		intx = map.x + 130,
+		inty = map.y + 50,
+		intw = 30,
+		inth = 200
 	}
 
 	--location:cloakroom
@@ -245,9 +258,6 @@ function love.load()
 		inth = 30
 	}
 
-	--TODO: Add in all the gig goers!
-	--TODO: Add loads of robed dudes in the bar when you come out of the venue! Creeepy...
-	
 	mate1 = {
 		x = map.x + 250,
 		y = map.y + 400,
@@ -281,7 +291,7 @@ function love.load()
 	}
 	
 
-       text = "Metalhead by Stafngrimr\n\nYou wake up in a bathroom, and can't remember how you got here. There's no one else around, and this place stinks. Your head hurts, you feel dazed and is that piss you can feel on your jeans?\nYou get up off the floor slowly and take a moment to gather yourself. Memories are slowly coming back. You were at a metal gig with your mates. Someone bought a round of drinks and then... nothing.\n\nYou better get yourself out of here. Find your friends and find out what happened to you.\n\n"
+       text = "Metalhead by Stafngrimr\n\nYou wake up in a bathroom, and can't remember how you got here. There's no one else around, and this place stinks. Your head hurts, you feel dazed and is that piss you can feel on your jeans?\nYou get up off the floor slowly and take a moment to gather yourself. Memories are coming back. You were at a gig with your mates. Someone bought a round of drinks and then... nothing.\n\nYou better get yourself out of here. Find your friends and find out what happened to you.\n\n"
 
         -- imagedump
 	-- rooms
@@ -310,11 +320,12 @@ end
 
 function love.update(dt)
 	player:update(dt)
-	
+
 	-- objects/people collisions
 	if player.position == "toilet" then
 		player:resolveCollision(toilets.x, toilets.y, toilets.width, toilets.height)
 		player:resolveCollision(stallwall.x, stallwall.y, stallwall.width, stallwall.height)
+		player:resolveCollision(map.x + 504, map.y, 96, 352)
 		if toiletDoor.unlocked == false then
 			player:resolveCollision(toiletDoor.x, toiletDoor.y, toiletDoor.width, toiletDoor.height)
 		end
@@ -361,12 +372,18 @@ function love.update(dt)
 
 	if player.position == "venue" then
 		player:resolveCollision(secretDoor.x, secretDoor.y, secretDoor.width, secretDoor.height)
+		player:resolveCollision(map.x, map.y + 45, 150, 555)
+		player:resolveCollision(map.x, map.y + 81, 316, 487)
+		player:resolveCollision(map.x, map.y + 107, 393, 383)
+		player:resolveCollision(map.x + 370, map.y + 425, 57, 59)
+		player:resolveCollision(map.x + 324, map.y + 501, 53, 54)
 	end
 
 	-- picking up objects
 	if player:collisionCheck(key.x, key.y, key.width, key.height)
 	and player.position == "toilet"
 	and key.acquired == false then
+		keyNoise:play()
 		text = text .."Aha, you've found the toilet door key!\n\n"
 		key.acquired = true
 	elseif player:collisionCheck(phone.x, phone.y, phone.width, phone.height)
@@ -404,6 +421,7 @@ function love.update(dt)
 	if player.position == "entrance" and player.interact == true then
 		if player:interactionCheck(bouncer) == true then
 			if bouncer.interact == false then
+				bouncerNoise:play()
 				text = text .."Bouncer: ...\n\n"
 				bouncer.interact = true
 			end
@@ -412,9 +430,14 @@ function love.update(dt)
 				text = text .."Merch Guy: You're that bloke from earlier. I told you to stay away from my table! Piss off!\n\n"
 				merchguy.interact = true
 			end
+		elseif player:interactionCheck(merchTable) == true then
+			if merchTable.interact == false then
+				text = text .."Assortment of shirts, hoodies, badges and other stuff from the band. You already have all of this...\n\n"
+				merchTable.interact = true
+			end
 		elseif phone.acquired == true and player:interactionCheck(mates) == true then
 			if mates.interact == false then
-				text = text .."Egg - Alright mate. You're round is it?\n\nBarney - Where the hell have you been? We've been looking for you and now the band's on and we're missing it! What's with all the robed guys?\n\nDave Lombardo - Hello my good friend!\n\nPress Enter Key"
+				text = text .."Egg - Alright mate. Your round is it?\n\nBarney - Where the hell have you been? We've been looking for you and now the band's on and we're missing it! What's with all the robed guys?\n\nDave Lombardo - Yes, it's me.\n\nPress Enter Key"
 				mates.interact = true
 			end
 		end
@@ -423,7 +446,7 @@ function love.update(dt)
 	if player.position == "cloakroom" and player.interact == true then
 		if player:interactionCheck(cloakTable) == true then
 			if cloakTable.interact == false then
-				text = "Attendant: Hello. You back again? Last band's on in a minute, didn't you say they're your favourite?They closed the door to the venue because someone was kicking off. Should be open now though if you wanted to go in.\n\nShe hands you some items in exchange for the ticket stub you found.\n\nIt's your wallet! Cards are all still there thank fuck.. there's also a weird bright red ticket stub, but with no number on it. It's been ripped, so I guess it's been used?\n\nBet my friends are in the venue.\n\n"
+				text = "Attendant: Hello. You back again? Last band's on in a minute, didn't you say they're your favourite? They closed the door to the venue because someone was kicking off. Should be open now though if you wanted to go in.\n\nShe hands you some items in exchange for the ticket stub you found.\n\nIt's your wallet! Cards are all still there thank fuck.. there's also a weird bright red ticket stub, but with no number on it. It's been ripped, so I guess it's been used?\n\nBet my friends are in the venue.\n\n"
 				cloakTable.interact = true
 			end
 		end
@@ -460,10 +483,12 @@ function love.update(dt)
 	-- Move from one room to another
 	if player.position == "entrance" then
 		if player:collisionCheck(map.x, map.y + 475, 1, 75) then
+			doorNoise:play()
 			player.position = "toilet"
 			player.x = map.x + 540
 			player.y = map.y + 487
 		elseif player:collisionCheck(map.x + 599, map.y + 475, 1, 75) then
+			doorNoise:play()
 			player.position = "cloakroom"
 			player.x = map.x + 10
 			player.y = map.y + 487
@@ -473,6 +498,7 @@ function love.update(dt)
 				player.firstCloakroom = false
 			end
 		elseif player:collisionCheck(map.x + 261, map.y, 75, 1) then
+			doorNoise:play()
 			player.position = "bar"
 			player.x = map.x + 273
 			player.y = map.y + 540
@@ -482,6 +508,7 @@ function love.update(dt)
 		end
 	elseif player.position == "toilet" then
 		if player:collisionCheck(map.x + 599, map.y + 475, 1, 75) then
+			doorNoise:play()
 			player.position = "entrance"
 			player.x = map.x + 10
 			player.y = map.y + 487
@@ -492,12 +519,14 @@ function love.update(dt)
 		end
 	elseif player.position == "cloakroom" then
 		if player:collisionCheck(map.x, map.y + 475, 1, 75) then
+			doorNoise:play()
 			player.position = "entrance"
 			player.x = map.x + 540
 			player.y = map.y + 487
 		end
 	elseif player.position == "bar" then
 		if player:collisionCheck(map.x, map.y + 261, 1, 75) then
+			doorNoise:play()
 			player.position = "venue"
 			player.x = map.x + 540
 			player.y = map.y + 273
@@ -507,6 +536,7 @@ function love.update(dt)
 				player.firstVenue = false
 			end
 		elseif player:collisionCheck(map.x + 261, map.y + 599, 75, 1) then
+			doorNoise:play()
 			player.position = "entrance"
 			player.x = map.x + 273
 			player.y = map.y + 10
@@ -517,13 +547,30 @@ function love.update(dt)
 		end
 	elseif player.position == "venue" then
 		if player:collisionCheck(map.x + 599, map.y + 261, 1, 75) then
+			doorNoise:play()
 			player.position = "bar"
 			player.x = map.x + 10
 			player.y = map.y + 273
 			if phone.acquired == true then
-				text = text .."Okay.. that's creepy.. I gotta get out of here quickly."
+				text = text .."Okay.. that's creepy.. I gotta get out of here quickly.\n\n"
 			end
 		end
+	end
+
+	-- music in venue
+	if player.position == "venue" then
+		song:play()
+	else
+		song:pause()
+	end
+
+	if player.position == "bar" and phone.acquired == false then
+		barNormalNoise:play()
+	elseif player.position == "bar" and phone.acquired == true then
+		barRobedNoise:play()
+	else
+		barNormalNoise:pause()
+		barRobedNoise:pause()
 	end
 end
 
@@ -589,9 +636,9 @@ function love.draw()
 	
 	--bar objects
 	if player.position == "bar" then
-		love.graphics.draw(barkeeptop.image, barkeeptop.x, barkeeptop.y)
-		love.graphics.draw(barkeepbottom.image, barkeepbottom.x, barkeepbottom.y)
-		if player.firstBar == true then
+		if phone.acquired == false then
+			love.graphics.draw(barkeeptop.image, barkeeptop.x, barkeeptop.y)
+			love.graphics.draw(barkeepbottom.image, barkeepbottom.x, barkeepbottom.y)
 			love.graphics.draw(robedNorth, robed_bar.x, robed_bar.y)
 		end
 	end
@@ -614,7 +661,7 @@ function love.draw()
 		love.graphics.draw(introScreen, map.x, map.y)
 		love.graphics.draw(enterScreen, square.x, square.y)
 	elseif gameOver == true then
-		text = "GAME OVER.\n\nHope you enjoyed the game!\n\nPlease press ESC to exit."
+		text = "GAME OVER.\n\nHope you enjoyed the game!\n\nPlease press ESC to exit.\n\n\nCredits\n\nsong: What the Flux? by Gigakoops via freemusicarchive.org\nart: Stafngrimr, professional Artist."
 	end
 end
 
