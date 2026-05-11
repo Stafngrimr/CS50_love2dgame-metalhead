@@ -201,7 +201,7 @@ function love.load()
 		y = map.y + 550,
 		width = 50,
 		height = 50,
-		image = love.graphics.newImage("img/peeps/bouncer.png"),
+		image = love.graphics.newImage("img/peeps/bouncer.gif"),
 		interact = false,
 		intx = map.x + 193,
 		inty = map.y + 520,
